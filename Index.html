@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>  
+<head>  
+ <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  
+  <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no"/>
+  <title></title>
+
+  <link rel="stylesheet" href="https://js.arcgis.com/3.15/dijit/themes/claro/claro.css">    
+  <link rel="stylesheet" href="https://js.arcgis.com/3.15/esri/css/esri.css">
+  <style> 
+    html, body { height: 100%; width: 100%; margin: 100; padding: 0; }
+   #map{
+      padding:0;
+	  height:100%;
+	  position:relative;
+    }
+  </style> 
+  
+  <style>
+header {
+    background-color:black;
+    color:white;
+    text-align:center;
+    padding:5px;	 
+}
+nav {
+    line-height:30px;
+    background-color:#eeeeee;
+    height:300px;
+    width:100px;
+    float:left;
+    padding:5px;	      
+}
+section {
+    width:350px;
+    float:left;
+    padding:10px;	 	 
+}
+footer {
+    background-color:black;
+    color:white;
+    clear:both;
+    text-align:center;
+    padding:5px;	 	 
+}
+</style>
+</head>
+<body>
+
+<header>
+<h1>Sinaloa, Mexico</h1>
+</header> 
+
+<div class="page-header">
+    <Font color="black"> <h2>Land Cover Change Over Time</h2>
+      </div>  
+<p>
+Land cover in the state of Sinaloa, Mexico has been altered by increasing urbanization and resource degradation.  
+This can be easily visualized with GIS-based representations and temporal displays of land cover.  
+Sinaloa has land cover data available for 1976, 1993, 2000, 2007, and 2011.  
+However, it should be noted that there is missing data in years 1976 and 1993 (small undocumented urbanized regions) which degrades the ability to make sound comparisons between these years and later years.
+</p>
+
+<p><a href="Mexico%202.html">Click to LayerSwiper</a></p>
+  
+
+<h4>Years</h4>
+<span class="years">
+<input type="radio" checked value="1976" name="left-side">1976</input>
+<input type="radio" value="1993" name="left-side">1993</input>
+<input type="radio" value="2007" name="left-side">2000</input>
+<input type="radio" value="2000" name="left-side">2007</input>
+<input type="radio" value="2011" name="left-side">2011</input>
+</span>
+<br/>
+<br/>
+
+<div id="map">
+	<div id="swipeDiv"></div>
+</div>
+</body>
+  
+  <script src="https://js.arcgis.com/3.15/"></script>
+  <script> 
+    var map;
+    require([
+      "esri/map", "esri/dijit/BasemapGallery", "esri/arcgis/utils",
+      "dojo/parser", "esri/layers/FeatureLayer", "esri/dijit/Legend",
+		"dojo/query","dojo/on", 
+	  
+      "dijit/layout/BorderContainer", "dijit/layout/ContentPane", "dijit/TitlePane",
+      "dojo/domReady!"
+      
+    ], function(
+      Map, BasemapGallery, arcgisUtils,
+      parser, FeatureLayer, LayerSwipe, query, on
+    ) {
+      parser.parse();
+
+      map = new Map("map", {
+        basemap: "topo",
+        center: [-107.2897514, 24.7926243 ],
+        zoom: 7
+      });
+	  
+	  //add the basemap gallery, in this case we'll display maps from ArcGIS.com including bing maps
+      var basemapGallery = new BasemapGallery({
+        showArcGISBasemaps: true,
+        map: map
+      }, "basemapGallery");
+      basemapGallery.startup();
+      
+      basemapGallery.on("error", function(msg) {
+        console.log("basemap gallery error:  ", msg);
+      });
+	  
+	  map_2007 = new FeatureLayer("http://gis.uspatial.umn.edu/arcgis/rest/services/MexicoLandCover_1976_2011/MapServer/3",
+	  {id:"2007"});
+	  map.addLayer(map_2007);
+	  
+	  map_2011 = new FeatureLayer("http://gis.uspatial.umn.edu/arcgis/rest/services/MexicoLandCover_1976_2011/MapServer/4",
+	  {id:"2011"});
+	  map.addLayer(map_2011);
+	  
+	  map_2000 = new FeatureLayer("http://gis.uspatial.umn.edu/arcgis/rest/services/MexicoLandCover_1976_2011/MapServer/2",
+	  {id:"2000"});
+	  map.addLayer(map_2000);
+	  
+	  map_1993 = new FeatureLayer("http://gis.uspatial.umn.edu/arcgis/rest/services/MexicoLandCover_1976_2011/MapServer/1",
+		{id:"1993"});
+	  map.addLayer(map_1993);
+	  
+	   map_1976 = new FeatureLayer("http://gis.uspatial.umn.edu/arcgis/rest/services/MexicoLandCover_1976_2011/MapServer/0",
+	   {id:"1976"});
+	  map.addLayer(map_1976);
+	  
+	   var years = query("span.years input");
+		 
+		 on(years, "change", function(){
+			var year = this.value;
+			
+			var layer = map.getLayer(year);
+			map.reorderLayer(layer, 5);
+		 });
+	  
+	     });
+  </script> 
+  
+  </html>
+  
+  
